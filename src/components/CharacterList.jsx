@@ -1,4 +1,4 @@
-import LoadingSpinner from "./utilities/LoadingSpinner";
+import LoadingSpinner from "../utilities/LoadingSpinner";
 import CharacterCard from "./CharacterCard";
 
 function CharacterList({characters, isLoading, favorites, onToggleFavorite}) {

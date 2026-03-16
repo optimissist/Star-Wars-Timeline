@@ -1,4 +1,4 @@
-import LoadingSpinner from "./utilities/LoadingSpinner";
+import LoadingSpinner from "../utilities/LoadingSpinner";
 import StarshipCard from "./StarshipCard";
 
 function StarshipList({starships, isLoading, favorites, onToggleFavorite}) {

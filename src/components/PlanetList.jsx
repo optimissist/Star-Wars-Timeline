@@ -1,4 +1,4 @@
-import LoadingSpinner from "./utilities/LoadingSpinner";
+import LoadingSpinner from "../utilities/LoadingSpinner";
 import PlanetCard from "./PlanetCard";
 
 function PlanetList({planets, isLoading, favorites, onToggleFavorite}) {
