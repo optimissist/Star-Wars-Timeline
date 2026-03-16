@@ -18,6 +18,7 @@ function NavBar({episodeId}) {
          style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
             Planets
         </NavLink>
+        <NavLink to='/favorites'>Favorites ❤️</NavLink>
     </div>
 
   );
