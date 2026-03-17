@@ -5,6 +5,7 @@ import {useTheme} from "./ThemeContext";
 import NavBar from "../utilities/NavBar";
 import ErrorMessage from "../utilities/ErrorMessage";
 import LoadingSpinner from "../utilities/LoadingSpinner";
+import FavoritesPage from "../utilities/FavoritesPage";
 import EpisodeTimeline from "../components/EpisodeTimeline";
 import FilmCard from "../components/FilmCard";
 import CharacterList from "../components/CharacterList";
@@ -14,13 +15,20 @@ import PlanetList from "../components/PlanetList";
 
 const getFavorites = (key) => JSON.parse(localStorage.getItem(key)) || [];
 
+function EpisodeView({ films }) {
+  const { episodeId } = useParams();
+  const film = films.find(f => f.episode_id === Number(episodeId));
+  return (
+    <>
+      <EpisodeTimeline films={films} selectedId={Number(episodeId)} />
+      {film && <FilmCard film={film} />}
+    </>
+  );
+}
+
 function App() {
   const [films, setFilms] = useState([]);
-  const [characters, setCharacters] = useState([]);
-  const [starships, setStarships] = useState([]);
-  const [planets, setPlanets] = useState([]);
-  const [filmsLoading, setFilmsLoading] = useState(true);
-  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [characterFavorites, setCharacterFavorites] = useState(() => getFavorites("characterFavorites"));
   const [starshipFavorites, setStarshipFavorites] = useState(() => getFavorites("starshipFavorites"));
@@ -29,7 +37,7 @@ function App() {
   const {theme} = useTheme();
 
   const fetchFilms = async () => {
-    setFilmsLoading(true);
+    setIsLoading(true);
     try {
       const res = await fetch('https://swapi.dev/api/films/');
       if (!res.ok) throw new Error('Failed to fetch films');
@@ -38,35 +46,12 @@ function App() {
     } catch (error) {
       setError(error.message);
     } finally {
-      setFilmsLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => { fetchFilms(); }, []);
-  
-  const fetchEpisodeDetails = async () => {
-    setDetailsLoading(true);
-    
-    const film = films.find(f => f.episode_id === Number(episodeId));
-    
-    try {
-      const [characters, starships, planets] = await Promise.all([
-        Promise.all(film.characters.map(url => fetch(url).then(r => r.json()))),
-        Promise.all(film.starships.map(url => fetch(url).then(r => r.json()))),
-        Promise.all(film.planets.map(url => fetch(url).then(r => r.json())))
-      ]);
 
-      setCharacters(characters);
-      setStarships(starships);
-      setPlanets(planets);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setDetailsLoading(false);
-    }
-  };
-
-  useEffect(() => { if (films.length > 0) fetchEpisodeDetails(); }, [episodeId, films.length]);
 
   const toggleCharacterFavorite = (name) => {
   setCharacterFavorites(prev =>
@@ -100,20 +85,45 @@ useEffect(() => {
   localStorage.setItem('planetFavorites', JSON.stringify(planetFavorites));
 }, [planetFavorites]);
 
+useEffect(() => {
+    document.body.style.backgroundColor = theme === "dark" ? "#242424" : "#ffffff";
+}, [theme]);
+
 
   return (
     <div className={theme}>
-      <EpisodeTimeline films={films} selectedId={id} />
-      <FilmCard film={selectedFilm} />
-      <NavBar episodeId={episodeId} />
+      <h1>Star Wars Saga Timeline</h1>
+      
+      <NavBar />
+      
+      {isLoading && <LoadingSpinner />}
+      
+      {error != null && <ErrorMessage message={error} /> }
 
     <Routes>
       <Route path='/' element={<Navigate to='/episode/1/characters' />} />
       <Route path='/episode/:episodeId' element={<Navigate to='characters' replace />} />
-      <Route path='/episode/:episodeId/characters' element={<CharacterList  />} />
-      <Route path='/episode/:episodeId/starships' element={<StarshipList  />} />
-      <Route path='/episode/:episodeId/planets' element={<PlanetList  />} />
-      <Route path='/favorites' element={<FavoritesPage  />} />
+      <Route path='/episode/:episodeId/characters' element={
+        <>
+          <EpisodeView films={films} />
+          <CharacterList films={films} favorites={characterFavorites} onToggleFavorite={toggleCharacterFavorite} />
+        </>
+           } />
+
+      <Route path='/episode/:episodeId/starships' element={
+        <>
+          <EpisodeView films={films} />
+          <StarshipList films={films} favorites={starshipFavorites} onToggleFavorite={toggleStarshipFavorite} />
+        </>
+        } />
+      <Route path='/episode/:episodeId/planets' element={
+        <>
+          <EpisodeView films={films} />
+         <PlanetList films={films} favorites={planetFavorites} onToggleFavorite={togglePlanetFavorite} />
+        </>
+    } />
+      <Route path='/favorites' element={
+        <FavoritesPage characterFavorites={characterFavorites} starshipFavorites={starshipFavorites} planetFavorites={planetFavorites} />} />
     </Routes>
 
     </div>
