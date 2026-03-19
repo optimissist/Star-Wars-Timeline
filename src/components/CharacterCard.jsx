@@ -5,7 +5,7 @@ function CharacterCard({character, isFavorite, onToggleFavorite}) {
             <p>{character.birth_year}</p>
             <p>{character.height}</p>
             <p>{character.gender}</p>
-            <button type="button" onClick={onToggleFavorite}>{isFavorite ? "❤️" : "♡" } </button>
+            <button type="button" onClick={() => onToggleFavorite(character.name)}>{isFavorite ? "❤️" : "♡" } </button>
         </div>
     )
 }
