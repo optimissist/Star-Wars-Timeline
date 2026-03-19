@@ -7,7 +7,7 @@ function NavBar() {
 
     return (
     <nav>
-        <p><Switch /> Light Side or Dark Side?</p>
+        <div><Switch /> Light Side or Dark Side?</div>
        <NavLink to={`/episode/${id}/characters`}
          style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
             Characters

@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
-import {useTheme} from "./ThemeContext";
+import {useTheme} from "../utilities/ThemeContext";
 
 import NavBar from "../utilities/NavBar";
 import ErrorMessage from "../utilities/ErrorMessage";
